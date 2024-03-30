@@ -10,13 +10,21 @@ import { imagesTemplate } from "./js/render-functions";
 const refs = {
   formEl: document.querySelector('.input-form'),
   infoEl: document.querySelector('.gallery'),
+  btnLoadMore: document.querySelector('.load-btn'),
 };
+
+let query;
+let currentPage = 1;
+let maxPage = 0;
+const per_page = 15;
 const loader = document.querySelector('.loader');
 
-refs.formEl.addEventListener("submit", e => {
+refs.formEl.addEventListener("submit", async e => {
     e.preventDefault();
     
-    const query = refs.formEl.elements.query.value;
+    query = refs.formEl.elements.query.value;
+    currentPage = 1;
+
     if (query === "") {
         iziToast.warning({
             color: 'yellow',
@@ -26,10 +34,11 @@ refs.formEl.addEventListener("submit", e => {
     } else {
         refs.infoEl.innerHTML = "";
         loader.classList.remove('is-hidden');
-        getImges(query)
-            .then(data => {
-                const markup = imagesTemplate(data.hits);
-                refs.infoEl.innerHTML = markup;
+        try {
+            const data = await getImges(query, currentPage);
+            maxPage = Math.ceil(data.totalHits / per_page);
+            const markup = imagesTemplate(data.hits);
+            refs.infoEl.innerHTML = markup;
                 
                 const lightbox = new SimpleLightbox('.gallery-link', {
                     captionsData: 'alt',
@@ -46,19 +55,48 @@ refs.formEl.addEventListener("submit", e => {
                     });
                     loader.classList.add('is-hidden');
                 }
-            })
-            .catch(err => {
-                iziToast.error({
+        } catch (err) {
+            iziToast.error({
                     color: 'red',
                     message: `❌ Sorry, there was a mistake. Please try again!`,
                     position: 'topRight',
                 });
                 refs.infoEl.innerHTML = '';
-            })
-            .finally(() => {
-                loader.classList.add('is-hidden');
-            });
-        
-        
+        } finally {
+            loader.classList.add('is-hidden');
+            checkBtnStatus();
+            };        
     }
 });
+
+refs.btnLoadMore.addEventListener('click', onLoadMoreClick);
+
+async function onLoadMoreClick() {
+  currentPage += 1;
+  loader.classList.remove('is-hidden');
+  try {
+    const data = await getImges(query, currentPage);
+    const markup = imagesTemplate(data.hits);
+    refs.infoEl.insertAdjacentHTML('beforeend', markup);
+  } catch (err) {
+    iziToast.error({
+                    color: 'red',
+                    message: `❌ Sorry, there was a mistake. Please try again!`,
+                    position: 'topRight',
+                });
+                // refs.infoEl.innerHTML = '';
+  }
+
+//   myScroll();
+  checkBtnStatus();
+  loader.classList.add('is-hidden');
+}
+
+function checkBtnStatus() {
+  if (currentPage >= maxPage) {
+    refs.btnLoadMore.classList.add('is-hidden');
+  } else {
+    refs.btnLoadMore.classList.remove('is-hidden');
+  }
+}
+
