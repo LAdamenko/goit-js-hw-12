@@ -11,6 +11,7 @@ const refs = {
   formEl: document.querySelector('.input-form'),
   infoEl: document.querySelector('.gallery'),
   btnLoadMore: document.querySelector('.load-btn'),
+  card: document.querySelector(".gallery"),
 };
 
 let query;
@@ -31,6 +32,7 @@ refs.formEl.addEventListener("submit", async e => {
             message: 'You forgot to describe the image',
             position: 'topRight',
         });
+      refs.infoEl.innerHTML = "";
     } else {
         refs.infoEl.innerHTML = "";
         loader.classList.remove('is-hidden');
@@ -84,10 +86,10 @@ async function onLoadMoreClick() {
                     message: `❌ Sorry, there was a mistake. Please try again!`,
                     position: 'topRight',
                 });
-                // refs.infoEl.innerHTML = '';
+                refs.infoEl.innerHTML = '';
   }
 
-//   myScroll();
+  myScroll();
   checkBtnStatus();
   loader.classList.add('is-hidden');
 }
@@ -95,8 +97,20 @@ async function onLoadMoreClick() {
 function checkBtnStatus() {
   if (currentPage >= maxPage) {
     refs.btnLoadMore.classList.add('is-hidden');
+    iziToast.info({
+            color: 'blue',
+            message: "We're sorry, but you've reached the end of search results.",
+            position: 'bottomCenter',
+        });
   } else {
     refs.btnLoadMore.classList.remove('is-hidden');
   }
 }
 
+function myScroll() {
+  const height = refs.card.firstChild.getBoundingClientRect().height * 2;
+  scrollBy({
+    top: height,
+    behavior: 'smooth',
+  });
+}

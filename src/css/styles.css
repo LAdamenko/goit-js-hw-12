@@ -48,6 +48,8 @@ button:hover {
     margin-top: 32px;
     display: block;
     text-align: center;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 input {
