@@ -80,6 +80,13 @@ async function onLoadMoreClick() {
     const data = await getImges(query, currentPage);
     const markup = imagesTemplate(data.hits);
     refs.infoEl.insertAdjacentHTML('beforeend', markup);
+    
+    const lightbox = new SimpleLightbox('.gallery-link', {
+                    captionsData: 'alt',
+                    captionDelay: 250,
+                    overlayOpacity: 0.8,
+                });
+                lightbox.refresh();
   } catch (err) {
     iziToast.error({
                     color: 'red',
