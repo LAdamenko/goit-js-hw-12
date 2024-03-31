@@ -1,3 +1,8 @@
+.loader-place {
+    text-align: center;
+    margin-top: 20px;
+}
+
 .loader {
     display: inline-block;
     font-size: 48px;
@@ -5,7 +10,6 @@
     font-weight: bold;
     color: #261b1b;
     position: relative;
-    
 }
 
 .loader::before {
